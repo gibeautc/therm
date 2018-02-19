@@ -71,8 +71,10 @@ def heat(temps):
     GPIO.output(17,GPIO.LOW)
     offCnt=offCnt+1
     return 0
+print("THIS WORK?")
 
-f=open('set')
+f=open('/home/pi/therm/set','r')
 SETTEMP=int(f.read())
+f.close()
 read_temp()
 
