@@ -6,28 +6,6 @@ from appJar import gui
 import os
 import sys
 
-if os.path.isdir("/home/pi"):
-	system="pi"
-else:
-	system="chadg"
-
-toGuiPath="/home/"+system+"/pipeToGui"
-fromGuiPath="/home/"+system+"/pipeFromGui"
-
-try:	
-	os.mkfifo(toGuiPath)
-except:
-	pass
-#if not os.path.isfile(fromGuiPath):
-try:
-	os.mkfifo(fromGuiPath)
-except:
-	pass
-pipeIn=os.open(toGuiPath,os.O_RDONLY|os.O_NONBLOCK)
-pipeOut=os.open(fromGuiPath,os.O_RDWR)
-
-msgBuffer=[]
-
 
 tools=["UPDATE","CLOSE","OFF"]
 
@@ -67,30 +45,28 @@ def haveInternet(host="8.8.8.8", port=53, timeout=3):
 	
 
 def checkUpdate():
-	global msgBuffer
-	msg=""
-	#print("Checking for updates")
 	try:
-		line=os.read(pipeIn,10)
-		#print(line)
-		msgBuffer.append(line)
-		#print(msgBuffer)
-		total="".join(msgBuffer)
-		lines=total.split("\n")
-		if len(lines)<2:
-			return
-		for x in range(len(lines)-1):
-			print("Message: "+lines[x])
-			msg=lines[x]
-		msgBuffer=[]
-		msgBuffer.append(lines[len(lines)-1])
-		#print("Here")	
-		
+		s.connect(("10.0.0.7",5050))
 	except:
-		#print(sys.exc_info())
-		#print("Error reading from pipe, maybe empty")
+		print("Connection Failed")
+		time.sleep(5)
 		return
-	#print(line)
+	b=""
+	st=""
+	while True:
+		#need to add a timeout in here
+		b=s.recv(1)
+		if b=="Q":
+			break
+		st=st+b
+	s.close()
+	try:
+		j=json.loads(st)
+		print("Got new data")
+		print(j)
+	except:
+		print("JSON loads or os.write failed")
+		print(st)
 	
 
 
