@@ -9,7 +9,7 @@ import time
 import json
 
 
-SET=0
+SET=60
 if os.path.isdir("/home/pi"):
 	system="pi"
 else:
