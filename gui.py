@@ -5,6 +5,12 @@ import socket
 from appJar import gui
 import os
 import sys
+import time
+import json
+if os.path.isdir("/home/pi"):
+	system="pi"
+else:
+	system="chadg"
 
 
 tools=["UPDATE","CLOSE","OFF"]
@@ -45,11 +51,11 @@ def haveInternet(host="8.8.8.8", port=53, timeout=3):
 	
 
 def checkUpdate():
+	s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 	try:
 		s.connect(("10.0.0.7",5050))
 	except:
 		print("Connection Failed")
-		time.sleep(5)
 		return
 	b=""
 	st=""
@@ -67,10 +73,27 @@ def checkUpdate():
 	except:
 		print("JSON loads or os.write failed")
 		print(st)
+		print(sys.exc_info())
+		return
+	try:
+		app.setLabel("lbOt",j['outside'])
+	except:
+		app.setLabel("lbOt","ERROR")
 	
+	try:
+		app.setLabel("lbIt",j['inside'])
+	except:
+		app.setLabel("lbIt","ERROR")
 
+	try:
+		app.setLabel("lbSp",j['setpoint'])
+	except:
+		app.setLabel("lbSp","ERROR")
 
-
+	try:
+		app.setLabel("lbHs",j['heatsink'])
+	except:
+		app.setLabel("lbHs","ERROR")
 
 def appSetup():
 	if system=="pi":
@@ -106,6 +129,7 @@ def appSetup():
 	
 	#Registered Events
 	app.registerEvent(checkUpdate)
+	app.setPollTime(5000)
 
 
 app=gui()
