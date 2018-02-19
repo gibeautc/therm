@@ -7,6 +7,9 @@ import os
 import sys
 import time
 import json
+
+
+SET=0
 if os.path.isdir("/home/pi"):
 	system="pi"
 else:
@@ -33,6 +36,16 @@ def tbFunc(button):
 	if button=="UPDATE":
 		app.thread(gitPull)
 		
+def press(but):
+	global SET
+	if but=="UP":
+		SET=SET+1
+		checkUpdate()
+		return
+	if but=="DOWN":
+		SET=SET-1
+		checkUpdate()
+		
 
 def haveInternet(host="8.8.8.8", port=53, timeout=3):
 	"""
@@ -54,6 +67,7 @@ def checkUpdate():
 	s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 	try:
 		s.connect(("10.0.0.7",5050))
+		s.send(str(SET))
 	except:
 		print("Connection Failed")
 		return
@@ -123,13 +137,15 @@ def appSetup():
 	app.addLabel("lbIt","00.000",1,1)
 	app.addLabel("lbSp","00.000",2,1)
 	app.addLabel("lbHs","00.000",3,1)
+	app.addButton("UP",press,4,0)
+	app.addButton("DOWN",press,4,1)
 	app.stopTab()
 		
 	app.stopTabbedFrame()
 	
 	#Registered Events
 	app.registerEvent(checkUpdate)
-	app.setPollTime(5000)
+	app.setPollTime(10000)
 
 
 app=gui()

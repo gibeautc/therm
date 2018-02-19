@@ -8,6 +8,17 @@ import json
 
 def client_thread(c,inside,outside,sp):
 	print("Connected")
+	sp=c.read(2)
+	try:
+		sp=int(sp)
+		f=open("set","w")
+		f.write(str(sp))
+		f.close()
+	except:
+		print("Set point failed")
+		print(sp)
+		print(sys.exc_info())
+		
 	j="{}"
 	j=json.loads(j)
 	j['inside']=inside
