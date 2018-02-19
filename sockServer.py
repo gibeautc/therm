@@ -4,11 +4,15 @@
 
 import socket
 import time
+import json
 
 def client_thread(c,inside,outside,sp):
 	print("Connected")
-	c.send(inside)
-	c.send(outside)
+	j="{}"
+	j=json.loads(j)
+	j['inside']=inside
+	j['outside']=outside
+	c.send(json.dumps(j))
 	c.send("Q")
 
 
@@ -47,7 +51,7 @@ while True:
 	try:
 		print("Waiting")
 		c,address=s.accept()
-		ct=client_thread(c,i,o,0)
 	except:
-		print("Error connecting to server")
-		
+		print("Error connecting to client")
+		continue
+	ct=client_thread(c,i,o,0)
