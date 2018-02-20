@@ -27,7 +27,7 @@ def client_thread(c,inside,outside,sp,h):
 	j['setpoint']=sp
 	j['heatsink']=h
 	c.send(json.dumps(j))
-	c.send("Q")
+	c.send("`")#end of tx
 
 
 print("running")
@@ -70,4 +70,8 @@ while True:
 	except:
 		print("Error connecting to client")
 		continue
-	ct=client_thread(c,i,o,sp,h)
+	try:
+		ct=client_thread(c,i,o,sp,h)
+	except:
+		print("Error calling client_thread")
+		print(sys.exc_info())
