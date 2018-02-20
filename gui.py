@@ -62,21 +62,37 @@ def haveInternet(host="8.8.8.8", port=53, timeout=3):
 		return False
 
 	
-
 def checkUpdate():
+	app.thread(checkUpdateThread)
+
+def checkUpdateThread():
 	s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 	try:
 		s.connect(("10.0.0.7",5050))
-		s.send(str(SET))
+		s.settimeout(2)
+		#s.send(str(SET))
 	except:
 		print("Connection Failed")
+		return
+	try:
+		s.send(str(SET))
+	except:
+		print("Error Sending Set Point")
+		print(sys.exc_info())
+		s.close()
 		return
 	b=""
 	st=""
 	while True:
 		#need to add a timeout in here
-		b=s.recv(1)
-		if b=="Q":
+		try:
+			b=s.recv(1)
+		except:
+			print("Timout for recv")
+			print(sys.exc_info())
+			s.close()
+			return
+		if b=='`':
 			break
 		st=st+b
 	s.close()
@@ -90,24 +106,32 @@ def checkUpdate():
 		print(sys.exc_info())
 		return
 	try:
-		app.setLabel("lbOt",j['outside'])
-	except:
-		app.setLabel("lbOt","ERROR")
+		app.queueFunction(app.setLabel,"lbOt",j['outside'])
+		#app.setLabel("lbOt",j['outside'])
+	except:	
+		app.queueFunction(app.setLabel,"lbOt","ERROR")
+		#app.setLabel("lbOt","ERROR")
 	
 	try:
-		app.setLabel("lbIt",j['inside'])
+		#app.setLabel("lbIt",j['inside'])
+		app.queueFunction(app.setLabel,"lbIt",j['inside'])
 	except:
-		app.setLabel("lbIt","ERROR")
+		#app.setLabel("lbIt","ERROR")
+		app.queueFunction(app.setLabel,"lbIt","ERROR")
 
 	try:
-		app.setLabel("lbSp",j['setpoint'])
+		#app.setLabel("lbSp",j['setpoint'])
+		app.queueFunction(app.setLabel,"lbSp",j['setpoint'])
 	except:
-		app.setLabel("lbSp","ERROR")
+		#app.setLabel("lbSp","ERROR")
+		app.queueFunction(app.setLabel,"lbSp","ERROR")
 
 	try:
-		app.setLabel("lbHs",j['heatsink'])
+		#app.setLabel("lbHs",j['heatsink'])
+		app.queueFunction(app.setLabel,"lbHs",j['heatsink'])
 	except:
-		app.setLabel("lbHs","ERROR")
+		#app.setLabel("lbHs","ERROR")
+		app.queueFunction(app.setLabel,"lbHs","ERROR")
 
 def appSetup():
 	if system=="pi":
